@@ -179,8 +179,16 @@
                                     $options->key
                                 )->pluck($options->table.'.'.$options->key);
                             }
-                            $selected_keys = old($relationshipField, $selected_keys);
-                            $selected_values = app($options->model)->whereIn($options->key, $selected_keys)->pluck($options->label, $options->key);
+							$selected_keys = old($relationshipField, $selected_keys);
+							$selected_values = app($options->model)
+								->whereIn($options->key, $selected_keys)
+								->pluck($options->label, $options->key);
+
+							if ($selected_values->isNotEmpty()) {
+								$selected_values = $selected_keys->mapWithKeys(function ($key) use ($selected_values) {
+									return [$key => $selected_values->get($key)];
+								});
+							}
                         @endphp
 
                         @if(!$row->required)
